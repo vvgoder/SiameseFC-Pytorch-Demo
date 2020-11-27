@@ -93,7 +93,8 @@ def main(video_dir, gpu_id, model_path):
 
 if __name__ == "__main__":
     # Fire(main)
-    video_dir = 'E:\Image_Dataset\Accident_classification/train/accident_high_have/95'
+    # the abs-path of your video
+    video_dir = ''
     gpu_id = 0
     model_path = 'models\siamfc_pretrained.pth'
     main(video_dir, gpu_id, model_path)
