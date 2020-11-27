@@ -6,10 +6,13 @@ If anyone find the original version,please give me the link in ISSUES,thank you!
 I have added some code about DEMO ON YOUR OWN VIDEO,see in demo_online_video.py
 
 ## How to run SiamseFC on your own video
-I have put the weight-file in folder "models",as you can see in  *'models\siamfc_pretrained.pth'*
+I have put the weight-file in folder "models", as you can see in  ***'models\siamfc_pretrained.pth'***
+
 if you want to  run SiamseFC on your own video
+
 just modify the below code in **demo_online_video.py**
-**Put your video path in video_dir value**
+
+**Put your video path in video_dir variable**
 
 ```
 if __name__ == "__main__":
@@ -21,7 +24,7 @@ if __name__ == "__main__":
 
 ```
 
-```
+
 ## Reference
 [1] Bertinetto, Luca and Valmadre, Jack and Henriques, Joo F and Vedaldi, Andrea and Torr, Philip H S
 		Fully-Convolutional Siamese Networks for Object Tracking
