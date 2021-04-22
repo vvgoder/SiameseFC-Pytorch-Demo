@@ -11,9 +11,13 @@ I have added some code about DEMO ON YOUR OWN VIDEO, see in demo_online_video.py
 
 I have put the weight-file in folder "models", as you can see in  ***'models\siamfc_pretrained.pth'***
 
-if you want to  run SiamseFC on your own video, just modify the below code in **demo_online_video.py**
+If you want to  run SiamseFC on your own video
 
-**Put your video path in video_dir variable**
+First, use **video2folder.py** script to convert your video to the folder with all frames
+
+Then,  modify the below code in **demo_online_video.py**
+
+**Put your frame path in video_dir variable**
 
 ```
 if __name__ == "__main__":
