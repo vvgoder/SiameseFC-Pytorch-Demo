@@ -13,11 +13,11 @@ I have put the weight-file in folder "models", as you can see in  ***'models\sia
 
 If you want to  run SiamseFC on your own video
 
-First, use **video2folder.py** script to convert your video to the folder with all frames
+- First, use **video2folder.py** script to convert your video to the folder with all frames
 
-Then,  modify the below code in **demo_online_video.py**
+- Then,  modify the below code in **demo_online_video.py**
 
-**Put your frame path in video_dir variable**
+- **Put your frame path in video_dir variable**
 
 ```
 if __name__ == "__main__":
