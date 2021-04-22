@@ -93,7 +93,7 @@ def main(video_dir, gpu_id, model_path):
 
 if __name__ == "__main__":
     # Fire(main)
-    # the abs-path of your video
+    # the abs-path of the generated frame of your video
     video_dir = ''
     gpu_id = 0
     model_path = 'models\siamfc_pretrained.pth'
