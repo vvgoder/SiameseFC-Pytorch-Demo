@@ -6,19 +6,21 @@ import numpy as np
 import cv2
 import time
 import sys
+
 sys.path.append(os.getcwd())
-
 from tqdm import tqdm
-
 from siamfc import SiamFCTracker
 
-a = []
+# 一些参数的外部定义
+rect = [0, 0, 0, 0]
+leftButtonDown = False
+leftButtonUp = True
 
 
 def main(video_dir, gpu_id, model_path):
     # load videos
     # python bin/demo_siamfc.py --model_path models/siamfc_pretrained.pth --gpu-id 0 --video-dir e:/save_data/5.mp4
-    filenames = sorted(glob.glob(os.path.join(video_dir, "*.jpg")),
+    filenames = sorted([os.path.join(video_dir, file_name) for file_name in os.listdir(video_dir)],
                        key=lambda x: int(os.path.basename(x).split('.')[0]))
     frames = [
         cv2.resize(cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGB),
@@ -31,42 +33,54 @@ def main(video_dir, gpu_id, model_path):
     for idx, frame in enumerate(frames):
         print(idx)
         if idx == 0:
-            # 一些参数的外部定义
-            ix, iy = -1, -1
-            drawing = False
-
             # 回调函数，鼠标的取点行为
             def draw_bbox(event, x, y, flags, param):
-                global ix, iy, drawing, a
+                global rect
+                global leftButtonDown
+                global leftButtonUp
                 # 当按下左键是返回起始位置坐标,cv2.EVENT_LBUTTONDOWN是鼠标左键按下的信号
                 if event == cv2.EVENT_LBUTTONDOWN:
-                    drawing = True
-                    ix, iy = x, y
-                    a.append((ix, iy))
+                    rect[0] = x
+                    rect[2] = x
+                    rect[1] = y
+                    rect[3] = y
+                    leftButtonUp = False
+                    leftButtonDown = True
 
-            # 当鼠标左键按下并移动是绘制图形。event 可以查看移动，flag 查看是否按下
+                # 当鼠标左键按下并移动是绘制图形。event 可以查看移动，flag 查看是否按下
                 elif event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:
-                    pass
+                    if leftButtonDown and not leftButtonUp:
+                        rect[2] = x
+                        rect[3] = y
 
                 elif event == cv2.EVENT_LBUTTONUP:
-                    ix, iy = x, y
-                    a.append((ix, iy))
-                    # copy防止修改frame，导致信息损失
-                    frame_bbox = frame.copy()
-                    cv2.rectangle(frame_bbox, a[0], a[1], (0, 255, 0), 2)
-                    cv2.imshow('frame', frame_bbox)
+                    if leftButtonDown and not leftButtonUp:
+                        x_min = min(rect[0], rect[2])
+                        y_min = min(rect[1], rect[3])
+
+                        x_max = max(rect[0], rect[2])
+                        y_max = max(rect[1], rect[3])
+
+                        rect[0] = x_min
+                        rect[1] = y_min
+                        rect[2] = x_max
+                        rect[3] = y_max
+
+                        leftButtonUp = True
+                        leftButtonDown = False
 
             cv2.namedWindow('frame')
             cv2.imshow('frame', frame)
             cv2.setMouseCallback('frame', draw_bbox)
-            cv2.waitKey(0)
+            while cv2.waitKey(1) == -1:
+                if not leftButtonUp and leftButtonDown:
+                    frame_ = frame.copy()
+                    cv2.rectangle(frame_, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
+                    cv2.imshow('frame', frame_)
             cv2.destroyAllWindows()
 
-            bbox = a[0] + a[1]  #左上+右下坐标格式
-            bbox_ori = bbox
-            bbox_xy = bbox  #左上+右下坐标格式
-            bbox_wh = (bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]
-                       )  #左上，宽高
+            bbox_xy = rect  # 左上+右下坐标格式
+            bbox_wh = (rect[0], rect[1], rect[2] - rect[0], rect[3] - rect[1])  # 左上，宽高
 
             # 将第一帧，以及第一帧的bbox作为输入
             tracker.init(frame, bbox_wh)
@@ -80,7 +94,7 @@ def main(video_dir, gpu_id, model_path):
             frame,
             (int(bbox_xy[0]), int(bbox_xy[1])),
             (int(bbox_xy[2]), int(bbox_xy[3])),
-            (0, 255, 0),  #green
+            (0, 255, 0),  # green
             2)
 
         if len(frame.shape) == 3:
@@ -94,7 +108,7 @@ def main(video_dir, gpu_id, model_path):
 if __name__ == "__main__":
     # Fire(main)
     # the abs-path of the generated frame of your video
-    video_dir = ''
+    video_dir = './frame'
     gpu_id = 0
-    model_path = 'models\siamfc_pretrained.pth'
+    model_path = r'models\siamfc_pretrained.pth'
     main(video_dir, gpu_id, model_path)
